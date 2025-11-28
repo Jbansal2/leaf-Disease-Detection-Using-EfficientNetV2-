@@ -1,0 +1,4 @@
+Final Model Results:
+Validation Accuracy: 98.93%
+Validation Loss: 0.8856
+Status: 98% ACHIEVED!

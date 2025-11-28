@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeafAI</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        sans-serif;
+      background: #f7f7f8;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    "
+  >
+    <!-- Sidebar -->
+    <div
+      id="sidebar"
+      style="
+        width: 260px;
+        background: #111827;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #374151;
+        height: 100vh;
+      "
+    >
+      <div style="padding: 16px; border-bottom: 1px solid #374151">
+        <button
+          onclick="startNewChat()"
+          style="
+            width: 100%;
+            background: #374151;
+            color: white;
+            border: 1px solid #4b5563;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+          "
+        >
+          <span>+</span>
+          New Chat
+        </button>
+      </div>
+
+      <div
+        id="chatHistory"
+        style="
+          flex: 1;
+          overflow-y: auto;
+          padding: 16px 8px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        "
+      >
+        <div
+          class="chat-item"
+          style="
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #d1d5db;
+            font-size: 14px;
+            background: #10b981;
+            color: white;
+          "
+        >
+          Plant Analysis Chat 1
+        </div>
+      </div>
+
+      <div style="padding: 16px; border-top: 1px solid #374151">
+        <div
+          style="
+            color: #d1d5db;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <span>👤</span>
+          Plant Disease Expert
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div
+      style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      "
+    >
+      <!-- Header -->
+      <div
+        style="
+          background: white;
+          padding: 12px 24px;
+          border-bottom: 1px solid #e5e7eb;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-shrink: 0;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+          "
+        >
+          <div
+            style="
+              width: 32px;
+              height: 32px;
+              background: linear-gradient(135deg, #10b981, #059669);
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 16px;
+            "
+          >
+            🌿
+          </div>
+          LeafAI 2.1
+        </div>
+        <div style="display: flex; gap: 12px">
+          <button
+            onclick="shareChat()"
+            style="
+              padding: 8px 16px;
+              border: 1px solid #d1d5db;
+              border-radius: 8px;
+              background: white;
+              color: #374151;
+              cursor: pointer;
+              font-size: 14px;
+            "
+          >
+            Share
+          </button>
+          <button
+            onclick="toggleSidebar()"
+            style="
+              padding: 8px 16px;
+              border: 1px solid #d1d5db;
+              border-radius: 8px;
+              background: white;
+              color: #374151;
+              cursor: pointer;
+              font-size: 14px;
+            "
+          >
+            ☰
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Container - Scrollable Area -->
+      <div
+        id="chatContainer"
+        style="
+          flex: 1;
+          overflow-y: auto;
+          padding: 24px;
+          max-width: 768px;
+          width: 100%;
+          margin: 0 auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        "
+      >
+        <!-- Welcome Section -->
+        <div id="welcomeSection" style="text-align: center; padding: 60px 0">
+          <div
+            style="
+              font-size: 32px;
+              font-weight: 600;
+              color: #111827;
+              margin-bottom: 16px;
+              background: linear-gradient(135deg, #10b981, #059669);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            "
+          >
+            Hello! I'm LeafAI 
+          </div>
+          <div style="font-size: 18px; color: #6b7280; margin-bottom: 32px">
+            Upload a plant image to detect diseases using AI
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Section - Fixed at Bottom -->
+      <div
+        style="
+          padding: 16px 24px;
+          border-top: 1px solid #e5e7eb;
+          background: white;
+          flex-shrink: 0;
+        "
+      >
+        <div style="max-width: 768px; width: 100%; margin: 0 auto">
+          <!-- Image Preview Section -->
+          <div
+            id="imagePreviewContainer"
+            style="display: none; margin-bottom: 12px; position: relative"
+          >
+            <div
+              style="
+                background: #f3f4f6;
+                border: 1px solid #d1d5db;
+                border-radius: 12px;
+                padding: 12px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+              "
+            >
+              <!-- Loader -->
+              <div
+                id="imageLoader"
+                style="
+                  display: none;
+                  width: 60px;
+                  height: 60px;
+                  border: 3px solid #e5e7eb;
+                  border-top: 3px solid #10b981;
+                  border-radius: 50%;
+                  animation: spin 1s linear infinite;
+                "
+              ></div>
+
+              <!-- Image Preview -->
+              <img
+                id="imagePreview"
+                style="
+                  display: none;
+                  width: 60px;
+                  height: 60px;
+                  object-fit: cover;
+                  border-radius: 8px;
+                  border: 1px solid #d1d5db;
+                "
+              />
+
+              <div style="flex: 1; min-width: 0">
+                <div
+                  id="imageFileName"
+                  style="
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #374151;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  "
+                ></div>
+                <div
+                  id="imageFileSize"
+                  style="font-size: 12px; color: #6b7280; margin-top: 4px"
+                ></div>
+              </div>
+
+              <button
+                onclick="removeImage()"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border: none;
+                  border-radius: 8px;
+                  background: #fee2e2;
+                  color: #dc2626;
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 18px;
+                  flex-shrink: 0;
+                "
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Box -->
+          <div
+            style="
+              background: white;
+              border: 1px solid #d1d5db;
+              border-radius: 24px;
+              padding: 12px 16px;
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            "
+          >
+            <textarea
+              id="inputField"
+              placeholder="Ask about plant diseases or upload an image..."
+              rows="1"
+              style="
+                flex: 1;
+                border: none;
+                outline: none;
+                font-size: 16px;
+                resize: none;
+                min-height: 24px;
+                max-height: 120px;
+                font-family: inherit;
+              "
+            ></textarea>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <button
+                onclick="triggerFileUpload()"
+                title="Upload Image"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border: none;
+                  border-radius: 8px;
+                  background: #f3f4f6;
+                  color: #6b7280;
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 16px;
+                "
+              >
+                📷
+              </button>
+              <button
+                onclick="sendMessage()"
+                title="Send"
+                id="sendBtn"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border: none;
+                  border-radius: 8px;
+                  background: #10b981;
+                  color: white;
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 16px;
+                "
+              >
+                ➤
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="imageInput" accept="image/*" style="display: none" />
+
+    <!-- Drop Overlay -->
+    <div
+      id="dropOverlay"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(16, 185, 129, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      "
+    >
+      <div
+        style="
+          text-align: center;
+          color: white;
+          font-size: 24px;
+          font-weight: 600;
+        "
+      >
+        <div style="font-size: 48px; margin-bottom: 16px">📸</div>
+        Drop your plant image here
+      </div>
+    </div>
+
+    <style>
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes blink {
+        0%,
+        50% {
+          border-color: #10b981;
+        }
+        51%,
+        100% {
+          border-color: transparent;
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.8;
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.4;
+        }
+        30% {
+          transform: translateY(-10px);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInSlide {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .typing-text {
+        border-right: 2px solid #10b981;
+        animation: blink 1s infinite;
+        min-height: 20px;
+      }
+
+      .thinking-icon {
+        animation: pulse 2s infinite;
+      }
+
+      .thinking-dot {
+        animation: bounce 1.4s infinite;
+      }
+
+      .thinking-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .thinking-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      .result-header {
+        opacity: 0;
+        animation: fadeInSlide 0.6s ease-out forwards;
+      }
+
+      .confidence-section {
+        opacity: 0;
+        animation: fadeInSlide 0.8s ease-out 0.5s forwards;
+      }
+
+      .recommendation-section {
+        opacity: 0;
+        animation: fadeInSlide 1s ease-out 1.2s forwards;
+      }
+
+      .confidence-fill {
+        height: 100%;
+        border-radius: 4px;
+        width: 0%;
+        transition: width 2s ease-out;
+      }
+
+      .confidence-fill.high {
+        background: #10b981;
+      }
+      .confidence-fill.medium {
+        background: #f59e0b;
+      }
+      .confidence-fill.low {
+        background: #ef4444;
+      }
+
+      .chat-item:hover {
+        background: #374151 !important;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      #chatContainer::-webkit-scrollbar,
+      #chatHistory::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Hide scrollbar for IE, Edge and Firefox */
+      #chatContainer,
+      #chatHistory {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      @media (max-width: 640px) {
+        #sidebar {
+          position: fixed;
+          left: -260px;
+          top: 0;
+          height: 100%;
+          z-index: 1000;
+          transition: left 0.3s ease;
+        }
+
+        #sidebar.open {
+          left: 0;
+        }
+      }
+    </style>
+
+    <script>
+      // Global variables
+      let selectedFile = null;
+      let currentChatId = 1;
+      let chatHistory = [];
+      let isAnalyzing = false;
+      let imagePreviewURL = null;
+
+      const chatContainer = document.getElementById("chatContainer");
+      const welcomeSection = document.getElementById("welcomeSection");
+      const inputField = document.getElementById("inputField");
+      const imagePreviewContainer = document.getElementById(
+        "imagePreviewContainer"
+      );
+      const imagePreview = document.getElementById("imagePreview");
+      const imageLoader = document.getElementById("imageLoader");
+      const imageFileName = document.getElementById("imageFileName");
+      const imageFileSize = document.getElementById("imageFileSize");
+
+      // Thinking animation messages
+      const thinkingStages = [
+        { icon: "🔍", text: "Analyzing image..." },
+        { icon: "🧠", text: "Processing plant features..." },
+        { icon: "🌿", text: "Identifying patterns..." },
+        { icon: "🔬", text: "Examining leaf structure..." },
+        { icon: "💭", text: "Comparing with database..." },
+        { icon: "✨", text: "Finalizing results..." },
+      ];
+
+      // Initialize
+      function initializeChat() {
+        chatHistory = [{ id: 1, title: "Plant Analysis Chat 1", messages: [] }];
+      }
+
+      // File upload
+      document
+        .getElementById("imageInput")
+        .addEventListener("change", handleImageUpload);
+
+      // Drag and drop
+      document.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        document.getElementById("dropOverlay").style.display = "flex";
+      });
+
+      document.addEventListener("dragleave", (e) => {
+        if (e.clientX === 0 && e.clientY === 0) {
+          document.getElementById("dropOverlay").style.display = "none";
+        }
+      });
+
+      document.addEventListener("drop", (e) => {
+        e.preventDefault();
+        document.getElementById("dropOverlay").style.display = "none";
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleImageFile(files[0]);
+        }
+      });
+
+      // Input auto-resize
+      inputField.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = Math.min(this.scrollHeight, 120) + "px";
+      });
+
+      // Enter key
+      inputField.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      function triggerFileUpload() {
+        document.getElementById("imageInput").click();
+      }
+
+      function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) handleImageFile(file);
+      }
+
+      function handleImageFile(file) {
+        if (!file.type.startsWith("image/")) {
+          alert("Please select a valid image file (JPG, JPEG, PNG)");
+          return;
+        }
+        if (file.size > 16 * 1024 * 1024) {
+          alert("File size too large. Please select an image under 16MB");
+          return;
+        }
+
+        selectedFile = file;
+
+        // Show preview container with loader
+        imagePreviewContainer.style.display = "block";
+        imageLoader.style.display = "block";
+        imagePreview.style.display = "none";
+
+        // Set file info
+        imageFileName.textContent = file.name;
+        imageFileSize.textContent = formatFileSize(file.size);
+
+        // Load image
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreviewURL = e.target.result;
+
+          // Simulate loading delay (500ms)
+          setTimeout(() => {
+            imageLoader.style.display = "none";
+            imagePreview.style.display = "block";
+            imagePreview.src = imagePreviewURL;
+          }, 500);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function removeImage() {
+        selectedFile = null;
+        imagePreviewURL = null;
+        imagePreviewContainer.style.display = "none";
+        imagePreview.src = "";
+        document.getElementById("imageInput").value = "";
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes === 0) return "0 Bytes";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i]
+        );
+      }
+
+      function showImageMessage(imageSrc) {
+        const message = document.createElement("div");
+        message.style.cssText =
+          "display: flex; gap: 12px; margin-bottom: 24px; flex-direction: row-reverse; animation: slideUp 0.3s ease-out;";
+
+        message.innerHTML = `
+                <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; background: #10b981; color: white; flex-shrink: 0;">U</div>
+                <div style="max-width: 70%; background: #10b981; color: white; border: 1px solid #10b981; border-radius: 16px; padding: 16px;">
+                    <img src="${imageSrc}" alt="Uploaded" style="max-width: 300px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e5e7eb;">
+                    <div>Analyze this plant image for diseases</div>
+                </div>
+            `;
+
+        chatContainer.appendChild(message);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      function createThinkingMessage() {
+        const message = document.createElement("div");
+        message.id = "thinkingMessage";
+        message.style.cssText =
+          "display: flex; gap: 12px; margin-bottom: 24px; animation: slideUp 0.3s ease-out;";
+
+        message.innerHTML = `
+                <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; background: #10b981; color: white; flex-shrink: 0;">🌿</div>
+                <div style="max-width: 70%; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px; color: #6b7280; font-style: italic;">
+                        <span class="thinking-icon" style="font-size: 18px;"></span>
+                        <span class="thinking-text">Analyzing image...</span>
+                        <div style="display: flex; gap: 4px;">
+                            <div class="thinking-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></div>
+                            <div class="thinking-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></div>
+                            <div class="thinking-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        chatContainer.appendChild(message);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return message;
+      }
+
+      function updateThinkingMessage(icon, text) {
+        const thinkingMsg = document.getElementById("thinkingMessage");
+        if (thinkingMsg) {
+          thinkingMsg.querySelector(".thinking-icon").textContent = icon;
+          thinkingMsg.querySelector(".thinking-text").textContent = text;
+        }
+      }
+
+      function removeThinkingMessage() {
+        const thinkingMsg = document.getElementById("thinkingMessage");
+        if (thinkingMsg) thinkingMsg.remove();
+      }
+
+      function startAnalysisWithStages() {
+        if (!selectedFile || isAnalyzing) return;
+        isAnalyzing = true;
+        createThinkingMessage();
+
+        let stageIndex = 0;
+        function nextStage() {
+          if (stageIndex < thinkingStages.length) {
+            const stage = thinkingStages[stageIndex];
+            updateThinkingMessage(stage.icon, stage.text);
+            stageIndex++;
+            const delay = Math.random() * 700 + 800;
+            setTimeout(nextStage, delay);
+          } else {
+            makeApiCall();
+          }
+        }
+        setTimeout(nextStage, 500);
+      }
+
+      function makeApiCall() {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        fetch("/predict", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            removeThinkingMessage();
+            isAnalyzing = false;
+            if (data.error) {
+              typeMessage(`❌ ${data.error}`, "assistant");
+            } else {
+              showResultWithProgressiveAnimation(data);
+            }
+          })
+          .catch((error) => {
+            removeThinkingMessage();
+            isAnalyzing = false;
+            typeMessage(
+              "❌ Error analyzing image. Please try again.",
+              "assistant"
+            );
+            console.error("Error:", error);
+          });
+      }
+
+      function typeMessage(text, sender = "assistant") {
+        const message = document.createElement("div");
+        message.style.cssText =
+          "display: flex; gap: 12px; margin-bottom: 24px; animation: slideUp 0.3s ease-out;";
+
+        const avatar =
+          sender === "user"
+            ? `<div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; background: #10b981; color: white; flex-shrink: 0;">U</div>`
+            : `<div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; background: #10b981; color: white; flex-shrink: 0;">🌿</div>`;
+
+        message.innerHTML = `
+                ${avatar}
+                <div style="max-width: 70%; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px;">
+                    <div class="typing-text"></div>
+                </div>
+            `;
+
+        chatContainer.appendChild(message);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        const typingDiv = message.querySelector(".typing-text");
+        let i = 0;
+        const typeInterval = setInterval(() => {
+          typingDiv.innerHTML = text.substring(0, i + 1);
+          i++;
+          if (i === text.length) {
+            clearInterval(typeInterval);
+            typingDiv.className = "";
+            typingDiv.innerHTML = text;
+          }
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 50);
+      }
+
+      function showResultWithProgressiveAnimation(data) {
+        const confidenceClass =
+          data.confidence >= 0.9
+            ? "high"
+            : data.confidence >= 0.75
+            ? "medium"
+            : "low";
+        const statusClass = data.is_healthy ? "healthy" : "diseased";
+        const statusIcon = data.is_healthy ? "✅" : "⚠️";
+        const statusColor = data.is_healthy ? "#059669" : "#dc2626";
+
+        const message = document.createElement("div");
+        message.style.cssText =
+          "display: flex; gap: 12px; margin-bottom: 24px; animation: slideUp 0.3s ease-out;";
+
+        message.innerHTML = `
+                <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; background: #10b981; color: white; flex-shrink: 0;">🌿</div>
+                <div style="max-width: 70%; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 16px;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 12px;">
+                        <div class="result-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-weight: 600; color: ${statusColor};">
+                            ${statusIcon} <span class="typing-text header-text"></span>
+                        </div>
+                        
+                        <div class="confidence-section" style="margin: 16px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span style="font-size: 14px; color: #6b7280;">Confidence</span>
+                                <span style="font-weight: 600;">${(
+                                  data.confidence * 100
+                                ).toFixed(1)}%</span>
+                            </div>
+                            <div style="width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin: 8px 0;">
+                                <div class="confidence-fill ${confidenceClass}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-section" style="font-size: 14px; color: #374151; margin-top: 16px;">
+                            <div style="margin-bottom: 8px;"><strong>Status:</strong> <span class="typing-text status-text"></span></div>
+                            <div><strong>Recommendation:</strong> <span class="typing-text recommendation-text"></span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+        chatContainer.appendChild(message);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Step 1: Type header
+        setTimeout(() => {
+          typeInElement(
+            message.querySelector(".header-text"),
+            `${data.plant} - ${data.disease}`,
+            () => {
+              // Step 2: Animate confidence bar
+              setTimeout(() => {
+                message.querySelector(".confidence-fill").style.width = `${
+                  data.confidence * 100
+                }%`;
+
+                // Step 3: Type status
+                setTimeout(() => {
+                  const statusText = data.is_healthy
+                    ? "Healthy Plant 🌿"
+                    : "Disease Detected 🦠";
+                  typeInElement(
+                    message.querySelector(".status-text"),
+                    statusText,
+                    () => {
+                      // Step 4: Type recommendation
+                      setTimeout(() => {
+                        const recommendationText = data.is_healthy
+                          ? "Continue regular care and monitoring. Your plant is in good health!"
+                          : "Immediate action recommended. Please consult with an agricultural expert for proper treatment options and disease management strategies.";
+
+                        typeInElement(
+                          message.querySelector(".recommendation-text"),
+                          recommendationText,
+                          () => {
+                            console.log("All typing complete");
+                          }
+                        );
+                      }, 400);
+                    }
+                  );
+                }, 1000);
+              }, 600);
+            }
+          );
+        }, 400);
+      }
+
+      function typeInElement(element, text, callback) {
+        if (!element) {
+          console.error("Element not found for typing");
+          return;
+        }
+
+        element.className = "typing-text";
+        let i = 0;
+
+        const typeInterval = setInterval(() => {
+          element.innerHTML = text.substring(0, i + 1);
+          i++;
+
+          if (i === text.length) {
+            clearInterval(typeInterval);
+            element.className = "";
+            if (callback) callback();
+          }
+
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 40);
+      }
+
+      function sendMessage() {
+        const message = inputField.value.trim();
+
+        // If image is selected, send it
+        if (selectedFile && imagePreviewURL) {
+          welcomeSection.style.display = "none";
+          showImageMessage(imagePreviewURL);
+
+          // Don't remove image yet - need it for API call
+          imagePreviewContainer.style.display = "none";
+
+          startAnalysisWithStages();
+          return;
+        }
+
+        // If text message
+        if (message && !isAnalyzing) {
+          welcomeSection.style.display = "none";
+          const msg = document.createElement("div");
+          msg.style.cssText =
+            "display: flex; gap: 12px; margin-bottom: 24px; flex-direction: row-reverse; animation: slideUp 0.3s ease-out;";
+          msg.innerHTML = `
+            <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; background: #10b981; color: white; flex-shrink: 0;">U</div>
+            <div style="max-width: 70%; background: #10b981; color: white; border: 1px solid #10b981; border-radius: 16px; padding: 16px;">${message}</div>
+        `;
+          chatContainer.appendChild(msg);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+
+          inputField.value = "";
+          inputField.style.height = "auto";
+
+          setTimeout(() => {
+            typeMessage(
+              "I can help you detect plant diseases from images. Please upload a plant photo to get started! 🌿",
+              "assistant"
+            );
+          }, 1000);
+        }
+      }
+
+      function makeApiCall() {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        fetch("/predict", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            removeThinkingMessage();
+            isAnalyzing = false;
+
+            // Clear the file after successful API call
+            selectedFile = null;
+            imagePreviewURL = null;
+            imagePreview.src = "";
+            document.getElementById("imageInput").value = "";
+
+            if (data.error) {
+              typeMessage(`❌ ${data.error}`, "assistant");
+            } else {
+              showResultWithProgressiveAnimation(data);
+            }
+          })
+          .catch((error) => {
+            removeThinkingMessage();
+            isAnalyzing = false;
+
+            // Clear on error too
+            selectedFile = null;
+            imagePreviewURL = null;
+            imagePreview.src = "";
+            document.getElementById("imageInput").value = "";
+
+            typeMessage(
+              "❌ Error analyzing image. Please try again.",
+              "assistant"
+            );
+            console.error("Error:", error);
+          });
+      }
+
+      function removeImage() {
+        selectedFile = null;
+        imagePreviewURL = null;
+        imagePreviewContainer.style.display = "none";
+        imagePreview.src = "";
+        document.getElementById("imageInput").value = "";
+      }
+
+      function startNewChat() {
+        chatContainer.innerHTML = "";
+        welcomeSection.style.display = "block";
+        chatContainer.appendChild(welcomeSection);
+        removeImage();
+      }
+
+      function shareChat() {
+        alert("Share functionality would be implemented here!");
+      }
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("open");
+      }
+
+      // Initialize
+      initializeChat();
+    </script>
+  </body>
+</html>
