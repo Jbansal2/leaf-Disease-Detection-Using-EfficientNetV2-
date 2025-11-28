@@ -207,20 +207,6 @@ After training, the following files are generated:
 - Verify folder structure matches expected format
 - Balance dataset classes if possible
 
-## Example Results
-
-```
-Model Performance:
-├── Accuracy:  0.9234
-├── Precision: 0.9156
-├── Recall:    0.9201
-└── F1-Score:  0.9178
-
-Model Sizes:
-├── Original: 67.4 MB
-├── TFLite:   8.9 MB (87% reduction)
-└── Quantized: 4.5 MB (93% reduction)
-```
 
 ## Contributing
 
@@ -233,12 +219,3 @@ Feel free to contribute improvements:
 ## License
 
 This project is provided for educational and research purposes.
-
-## Citation
-
-If you use this code in your research, please cite:
-
-```
-Plant Leaf Disease Detection with EfficientNetV2 and Meta-heuristic Optimization
-GitHub Copilot, 2025
-```
